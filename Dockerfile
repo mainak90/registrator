@@ -12,7 +12,7 @@ RUN export GOPATH=/go && mkdir -p /go/bin && export PATH=$PATH:/go/bin \
 
 # fix deprecations
 RUN cd $GOPATH/src/github.com/ugorji/go && git checkout 8c0409fcbb70099c748d71f714529204975f6c3f \
-    && cd $GOPATH/src/github.com/hashicorp/consul && git checkout v0.6.3
+    && cd $GOPATH/src/github.com/hashicorp/consul && git checkout v0.6.3 && go get -d
 
 # build registrator
 RUN cd /go/src/github.com/gliderlabs/registrator \
