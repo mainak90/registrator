@@ -117,6 +117,7 @@ func main() {
 		}
 
 		if err != nil && attempt == *retryAttempts {
+			log.Println(err)
 			assert(err)
 		}
 
