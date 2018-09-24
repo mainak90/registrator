@@ -105,6 +105,10 @@ func main() {
 		Cleanup:         *cleanup,
 	})
 
+	if err != nil {
+		log.Println(err)
+	}
+
 	assert(err)
 
 	attempt := 0
