@@ -210,7 +210,7 @@ func (b *Bridge) add(containerId string, quiet bool) {
 		ports[string(port)] = servicePort(container, port, published)
 	}
 
-	if len(ports) == 0 && !quiet {
+	if len(ports) == 0 && !strings.HasPrefix(container.HostConfig.NetworkMode, "container:") && !quiet {
 		log.Println("ignored:", container.ID[:12], "no published ports")
 		return
 	}
@@ -282,6 +282,26 @@ func (b *Bridge) newService(port ServicePort, isgroup bool) *Service {
 		p, _ = strconv.Atoi(port.HostPort)
 	}
 	service.Port = p
+
+	// NetworkMode can point to another container (kuberenetes pods)
+	networkMode := container.HostConfig.NetworkMode
+	if networkMode != "" {
+	  if strings.HasPrefix(networkMode, "container:") {
+		networkContainerId := strings.Split(networkMode, ":")[1]
+		log.Println(service.Name + ": detected container NetworkMode, linked to: " + networkContainerId[:12])
+		networkContainer, err := b.docker.InspectContainer(networkContainerId)
+		if err != nil {
+		  log.Println("unable to inspect network container:", networkContainerId[:12], err)
+		} else {
+		  if networkContainer.NetworkSettings.IPAddress != "" {
+			service.IP = networkContainer.NetworkSettings.IPAddress
+		  } else {
+			service.IP = strings.Split(networkContainer.HostConfig.ExtraHosts[0], ":")[1]
+		  }
+		  log.Println(service.Name + ": using network container IP " + service.IP)
+		}
+	  }
+	}
 
 	if port.PortType == "udp" {
 		service.Tags = combineTags(
