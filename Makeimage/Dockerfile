@@ -1,4 +1,4 @@
-FROM 049736579808.dkr.ecr.eu-west-1.amazonaws.com/registrator:v7.1
+FROM 049736579808.dkr.ecr.eu-west-1.amazonaws.com/registrator:v7.2
 
 COPY docker-entrypoint.sh /bin/docker-entrypoint.sh
 
